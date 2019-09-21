@@ -1,0 +1,8 @@
+{
+    "python.pythonPath": "D:\\Anaconda3\\python.exe",
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
+    "python.linting.pylintArgs": [
+        "--generated-members=numpy.* ,torch.* ,cv2.* , cv.*"
+        ]
+}
