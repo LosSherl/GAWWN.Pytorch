@@ -3,8 +3,8 @@ import datetime
 import torch
 from torch.autograd import Variable
 
-
 from GAWWN.tools.config import cfg
+from GAWWN.tools.tools import showPic
 
 def train(netG, netD, dataloader, device, optimizerG, optimizerD, \
         criterion, schedulerG, schedulerD, logger, checkpointer):
@@ -82,7 +82,8 @@ def train(netG, netD, dataloader, device, optimizerG, optimizerD, \
                     fake_score = fake_score, lr = optimizerG.param_groups[0]["lr"],
                     loss_g = errG, loss_d = errD
                 )
-                # display.image()
+                showPic(fake_imgs[:4], win=10)
+                showPic(imgs[:4], win=30)
         schedulerG.step()
         schedulerD.step()
         time_spent = time.time() - start_training_time

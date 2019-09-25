@@ -1,17 +1,11 @@
 import os
-import datetime
-import time
-import logging
 import argparse
 
 import torch
-import torch.nn as nn
-from torch.autograd import Variable
 from torch.utils.data import DataLoader
 
 from GAWWN.tools.logger import setupLogger
 from GAWWN.tools.config import cfg
-from GAWWN.tools.tools import weight_init
 from GAWWN.model.model_builder import build_models
 from GAWWN.dataset.dataset_builder import ImageTextLocDataset
 from GAWWN.engine.trainer import train
