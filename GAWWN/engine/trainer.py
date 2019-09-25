@@ -20,18 +20,18 @@ def train(netG, netD, dataloader, device, optimizerG, optimizerD, \
     for epoch in range(nepochs):
         netG.train()
         netD.train()
-
-        fake_label = Variable(torch.FloatTensor(batch_size).fill_(0)).to(device)
-        real_label = Variable(torch.FloatTensor(batch_size).fill_(0)).to(device)
-        noise = Variable(torch.FloatTensor(batch_size, cfg.GAN.Z_DIM)).to(device)
-
         for iteration, (imgs, txts, locs, filename, caption) in enumerate(dataloader):
+            bs = imgs.shape[0]
             imgs = Variable(imgs).to(device)
             txts = Variable(txts).to(device)
             locs = Variable(locs).to(device)
-            shuf_idx = torch.randperm(batch_size).to(device)
+            shuf_idx = torch.randperm(bs).to(device)
             txts_shuf = Variable(torch.index_select(txts, 0, shuf_idx)).to(device)
-            
+
+            fake_label = Variable(torch.FloatTensor(bs).fill_(0)).to(device)
+            real_label = Variable(torch.FloatTensor(bs).fill_(0)).to(device)
+            noise = Variable(torch.FloatTensor(bs, cfg.GAN.Z_DIM)).to(device)
+
             # Generate fake images
             noise.data.normal_(0, 1)
             fake_imgs = netG(txts, locs, noise)
@@ -64,7 +64,7 @@ def train(netG, netD, dataloader, device, optimizerG, optimizerD, \
             errG.backward()
             optimizerG.step()
 
-            if iteration % 10 == 0:
+            if iteration % 1 == 0:
                 logger.info(
                     ", ".join(
                         [
