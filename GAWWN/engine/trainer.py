@@ -14,7 +14,6 @@ def train(netG, netD, dataloader, device, optimizerG, optimizerD, \
     start_training_time = time.time()
     nepochs = cfg.NEPOCHS
     cls_weight = cfg.GAN.CLS_WEIGHT
-    batch_size = cfg.BATCH_SIZE
     fake_score = cfg.GAN.FAKE_SCORE
 
     for epoch in range(nepochs):
