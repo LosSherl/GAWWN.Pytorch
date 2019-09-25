@@ -131,15 +131,17 @@ class Dis(nn.Module):
         self.F_globalD = globalD(self.imgGlobalD, self.prep_txtD)
         self.judge = nn.Sequential(
             nn.Linear(self.ndf * 2, self.ndf),
-            nn.BatchNorm2d(self.ndf),
+            nn.BatchNorm1d(self.ndf),
             nn.LeakyReLU(0.2, True),
             nn.Linear(self.ndf, 1),
             nn.Sigmoid()
         )
 
-    def forward(self, img, loc, txt):
+    def forward(self, img, txt, loc):
         region_d = self.F_regionD(img, loc, txt)
         global_d = self.F_globalD(img, txt)
+        print(region_d.shape)
+        print(global_d.shape)
         x = torch.cat((region_d, global_d), 1)
         x = self.judge(x)
         return x

@@ -9,10 +9,11 @@ __C.NAME = "GAWWN"
 # __C.ROOT_PATH = "/data/cl/CUB_200_2011"
 __C.ROOT_PATH = "/home/joshua/CUB"
 __C.NEPOCHS = 1000
-__C.CHECKPOINT_PEROID = 100
+__C.CHECKPOINT_PERIOD = 100
 __C.LR = 0.0002
 __C.BETAS = (0.5, 0.999)
 __C.LR_DECAY = 0.5
+__C.DECAY_PERIOD = 100
 __C.OUTPUT_DIR = "output"
 
 # Tree Options
@@ -35,6 +36,8 @@ __C.IMAGE.LOADSIZE = 150
 __C.IMAGE.FINESIZE = 128
 
 __C.GAN = edict()
+__C.GAN.CLS_WEIGHT = 0.5
+__C.GAN.FAKE_SCORE = 0.5
 __C.GAN.Z_DIM = 100
 __C.GAN.LOC_DIM = 16 
 __C.GAN.NGF = 128   # generator filters in first conv layer

@@ -6,15 +6,17 @@ import argparse
 
 import torch
 import torch.nn as nn
+from torch.autograd import Variable
 from torch.utils.data import DataLoader
 
 from GAWWN.tools.logger import setupLogger
 from GAWWN.tools.config import cfg
 from GAWWN.tools.tools import weight_init
-from GAWWN.model.generator import Gen
-from GAWWN.model.discriminator import Dis
+from GAWWN.model.model_builder import build_models
 from GAWWN.dataset.dataset_builder import ImageTextLocDataset
 from GAWWN.engine.trainer import train
+from GAWWN.tools.checkpointer import Checkpointer
+
 
 def main():
     parser = argparse.ArgumentParser(description="GAWWN")
@@ -59,24 +61,20 @@ def main():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    netG = Gen()
-    netG.apply(weight_init)
-    netD = Dis()
-    netD.apply(weight_init)
-    netG.to(device)
-    netD.to(device)
+    netG, netD, criterion, optimizerG, optimizerD, \
+        schedulerG, schedulerD = build_models(device)
+
+    checkpointer = Checkpointer(netG, netD, optimizerG, optimizerD, schedulerG, schedulerD, logger, ouput_dir)
+    
 
     logger.info("dataloader")
     trn_dataset = ImageTextLocDataset(cfg.ROOT_PATH, "train")
     trn_loader = DataLoader(trn_dataset, cfg.BATCH_SIZE, shuffle=True)
     logger.info("data loaded")
 
-    criterion = nn.BCELoss().to(device)
-    optimizerG = torch.optim.Adam(netG.parameters(), lr=cfg.LR, betas=cfg.BETAS)
-    optimizerD = torch.optim.Adam(netD.parameters(), lr=cfg.LR, betas=cfg.BETAS)
 
-    train(netG, netD, trn_loader, device, optimizerG, optimizerD, criterion, logger)
+    train(netG, netD, trn_loader, device, optimizerG, optimizerD, criterion, schedulerG, schedulerD, logger, checkpointer)
 
-    
+
 if __name__ == "__main__":
     main()

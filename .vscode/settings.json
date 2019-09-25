@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "D:\\Anaconda3\\python.exe",
+    "python.pythonPath": "/home/joshua/.conda/envs/torch/bin/python",
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true,
     "python.linting.pylintArgs": [

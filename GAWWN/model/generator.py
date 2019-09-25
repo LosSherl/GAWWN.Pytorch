@@ -68,7 +68,7 @@ class Noise_txt_global(nn.Module):
 
     def forward(self, txt, loc, z):
         loc = self.pre_loc(loc)
-        loc.view(-1, self.ngf * 4)      # (bs, ngf * 4)
+        loc = loc.view(-1, self.ngf * 4)      # (bs, ngf * 4)
 
         noise_txt = self.F_noise_txt(txt, z)    # (bs, ngf * 8)
         noise_txt = self.beforeCat(noise_txt)   # (bs, ngf * 4)
@@ -148,7 +148,7 @@ class Gen(nn.Module):
             nn.ConvTranspose2d(self.ngf * 2, self.ngf, 4, 2, 1),
             nn.BatchNorm2d(self.ngf),
             nn.ReLU(True),
-            nn.ConvTranspose2d(self.ngf * 2, 3, 4, 2, 1),
+            nn.ConvTranspose2d(self.ngf, 3, 4, 2, 1),
             nn.Tanh()
         )
 
