@@ -21,7 +21,7 @@ def weight_init(m):
 
 def showPic(imgs, win=0):
     imgs = [x.detach().cpu().numpy().transpose(1, 2, 0) for x in imgs]
-    half = len(imgs) / 2
+    half = len(imgs) // 2
     row1 = np.concatenate(imgs[:half], 1)
     row2 = np.concatenate(imgs[half:], 1)
     content = np.concatenate((row1, row2), 0)
