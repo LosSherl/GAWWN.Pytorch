@@ -65,20 +65,22 @@ def train(netG, netD, dataloader, device, optimizerG, optimizerD, \
             optimizerG.step()
 
             if iteration % 10 == 0:
-                logger.info(", ".join(
-                    [
-                        "Epoch: [{epoch}/{num_epochs}]",
-                        "Step: [{iter}/{total_step}",
-                        "Fake_score: {fake_score:.4f}",
-                        "lr: {lr:.6f}",
-                        "loss G: {loss_g:.4f}%",
-                        "loss D: {loss_d:.4f}",
-                    ]
-                )).format(
-                    epoch = epoch + 1, num_epochs = nepochs,
-                    iter = iteration + 1, total_step = total_step,
-                    fake_score = fake_score, lr = optimizerG.param_groups[0]["lr"],
-                    loss_g = errG, loss_d = errD
+                logger.info(
+                    ", ".join(
+                        [
+                            "Epoch: [{epoch}/{num_epochs}]",
+                            "Step: [{iter}/{total_step}",
+                            "Fake_score: {fake_score:.4f}",
+                            "lr: {lr:.6f}",
+                            "loss G: {loss_g:.4f}",
+                            "loss D: {loss_d:.4f}",
+                        ]
+                    ).format(
+                        epoch = epoch + 1, num_epochs = nepochs,
+                        iter = iteration + 1, total_step = total_step,
+                        fake_score = fake_score, lr = optimizerG.param_groups[0]["lr"],
+                        loss_g = errG, loss_d = errD
+                    )
                 )
                 showPic(fake_imgs[:4], win=10)
                 showPic(imgs[:4], win=30)
