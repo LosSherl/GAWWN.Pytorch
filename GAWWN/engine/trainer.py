@@ -28,7 +28,7 @@ def train(netG, netD, dataloader, device, optimizerG, optimizerD, \
             imgs = Variable(imgs).to(device)
             txts = Variable(txts).to(device)
             locs = Variable(locs).to(device)
-            shuf_idx = torch.randperm(batch_size)
+            shuf_idx = torch.randperm(batch_size).to(device)
             txts_shuf = Variable(torch.index_select(txts, 0, shuf_idx)).to(device)
             
             # Generate fake images
