@@ -31,11 +31,11 @@ def get_img_locs(img_path, parts, imsize, transform=None, normalize=None):
     locs = torch.zeros((num_elt, keypoint_dim, keypoint_dim))
    
     for i in range(len(parts)):
-        parts[i][0] = max(1, parts[i][0] - w1) / imsize
-        parts[i][1] = max(1, parts[i][1] - h1) / imsize
+        parts[i][0] = max(1, parts[i][0] - w1)
+        parts[i][1] = max(1, parts[i][1] - h1)
         if parts[i][2] > 0.1:
-            x = min(keypoint_dim - 1, round(parts[i][0] * keypoint_dim))
-            y = min(keypoint_dim - 1, round(parts[i][1] * keypoint_dim))
+            x = min(keypoint_dim - 1, round(parts[i][0] * keypoint_dim / imsize))
+            y = min(keypoint_dim - 1, round(parts[i][1] * keypoint_dim / imsize))
             locs[i][y][x] = 1
     
     if transform is not None:
