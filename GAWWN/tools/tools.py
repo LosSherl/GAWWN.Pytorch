@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 import display
+import cv2
 
 
 def replicate(x, dim, times):
@@ -20,7 +21,7 @@ def weight_init(m):
         m.bias.data.fill_(0)
 
 def showPic(imgs, win=0):
-    imgs = [x.detach().cpu().numpy().transpose(1, 2, 0) for x in imgs]
+    imgs = [cv2.flip(x.detach().cpu().numpy().transpose(1, 2, 0), 0) for x in imgs]
     half = len(imgs) // 2
     row1 = np.concatenate(imgs[:half], 1)
     row2 = np.concatenate(imgs[half:], 1)
