@@ -40,17 +40,17 @@ def train(netG, netD, dataloader, device, optimizerG, optimizerD, \
             label.data.fill_(1)
             netD.zero_grad()
 
-            output = netD(imgs, locs, txts)
+            output = netD(imgs, txts, locs)
             errD_real = criterion(output, label)
             
             # train with wrong
             label.data.fill_(0)
-            output = netD(imgs, locs, txts_shuf)
+            output = netD(imgs, txts_shuf, locs)
             errD_wrong = cls_weight * criterion(output, label)
 
             # train with fake
             # label.data.fill_(0)
-            output = netD(fake_imgs, locs, txts)
+            output = netD(fake_imgs, txts, locs)
             fake_score = 0.99 * fake_score + 0.01 * output.mean()
             errD_fake = (1 - cls_weight) * criterion(output, label)
             
