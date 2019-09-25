@@ -53,11 +53,12 @@ def train(netG, netD, dataloader, device, optimizerG, optimizerD, \
             errD_fake = (1 - cls_weight) * criterion(output, fake_label)
             
             errD = errD_real + errD_fake + errD_wrong
-            errD.backward(retain_graph=True)
+            errD.backward()
             optimizerD.step()
 
             # update G network
             netG.zero_grad()
+            output = netD(fake_imgs, txts, locs)
             fake_score = 0.99 * fake_score + 0.01 * output.mean()
             errG = criterion(output, real_label)
             errG.backward()
