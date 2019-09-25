@@ -21,7 +21,8 @@ def train(netG, netD, dataloader, device, optimizerG, optimizerD, \
         netG.train()
         netD.train()
 
-        label = Variable(torch.FloatTensor(batch_size).fill_(0)).to(device)
+        fake_label = Variable(torch.FloatTensor(batch_size).fill_(0)).to(device)
+        real_label = Variable(torch.FloatTensor(batch_size).fill_(0)).to(device)
         noise = Variable(torch.FloatTensor(batch_size, cfg.GAN.Z_DIM)).to(device)
 
         for iteration, (imgs, txts, locs, filename, caption) in enumerate(dataloader):
@@ -37,32 +38,29 @@ def train(netG, netD, dataloader, device, optimizerG, optimizerD, \
 
             # Update D network
             # train with real
-            label.data.fill_(1)
             netD.zero_grad()
 
             output = netD(imgs, txts, locs)
-            errD_real = criterion(output, label)
+            errD_real = criterion(output, real_label)
             
             # train with wrong
-            label.data.fill_(0)
             output = netD(imgs, txts_shuf, locs)
-            errD_wrong = cls_weight * criterion(output, label)
+            errD_wrong = cls_weight * criterion(output, fake_label)
 
             # train with fake
             # label.data.fill_(0)
             output = netD(fake_imgs, txts, locs)
             fake_score = 0.99 * fake_score + 0.01 * output.mean()
-            errD_fake = (1 - cls_weight) * criterion(output, label)
+            errD_fake = (1 - cls_weight) * criterion(output, fake_label)
             
             errD = errD_real + errD_fake + errD_wrong
             errD.backward()
             optimizerD.step()
 
             # update G network
-            label.data.fill_(1)
             netG.zero_grad()
             fake_score = 0.99 * fake_score + 0.01 * output.mean()
-            errG = criterion(output, label)
+            errG = criterion(output, real_label)
             errG.backward()
             optimizerG.step()
 

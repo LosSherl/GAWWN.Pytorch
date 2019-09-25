@@ -140,8 +140,6 @@ class Dis(nn.Module):
     def forward(self, img, txt, loc):
         region_d = self.F_regionD(img, loc, txt)
         global_d = self.F_globalD(img, txt)
-        print(region_d.shape)
-        print(global_d.shape)
         x = torch.cat((region_d, global_d), 1)
         x = self.judge(x)
         return x

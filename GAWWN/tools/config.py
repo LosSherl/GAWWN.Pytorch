@@ -6,8 +6,8 @@ cfg = __C
 # general setting
 __C.BATCH_SIZE = 64
 __C.NAME = "GAWWN"
-# __C.ROOT_PATH = "/data/cl/CUB_200_2011"
-__C.ROOT_PATH = "/home/joshua/CUB"
+__C.ROOT_PATH = "/data/cl/CUB_200_2011"
+#__C.ROOT_PATH = "/home/joshua/CUB"
 __C.NEPOCHS = 1000
 __C.CHECKPOINT_PERIOD = 100
 __C.LR = 0.0002
