@@ -21,8 +21,8 @@ def get_img_locs(img_path, parts, imsize, transform=None, normalize=None):
     for i in range(len(parts)):
         parts[i][0] = max(1, math.floor(factor_x * parts[i][0]))
         parts[i][1] = max(1, math.floor(factor_y * parts[i][1]))
-    w1 = math.ceil(np.random.uniform(1e-2, imsize - load_size))
-    h1 = math.ceil(np.random.uniform(1e-2, imsize - load_size))
+    w1 = math.ceil(np.random.uniform(1e-2, load_size - imsize))
+    h1 = math.ceil(np.random.uniform(1e-2, load_size - imsize))
     # crop to (imsize * imsize)
     img = t_img.crop((w1, h1, w1 + imsize, h1 + imsize))
     
@@ -78,7 +78,7 @@ class ImageTextLocDataset(data.Dataset):
 
     def __getitem__(self, index):
         idx = self.idxs[index] - 1
-        filename = self.idx2filename[idx]
+        filename = self.idx2filename[index]
         img = self.images[idx]
         part_locs = self.part_locs[idx]
         no = np.random.randint(0, cfg.TEXT.CAPTIONS_PER_IMAGE)
