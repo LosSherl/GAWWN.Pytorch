@@ -21,8 +21,8 @@ def train(netG, netD, dataloader, device, optimizerG, optimizerD, \
         netG.train()
         netD.train()
 
-        label = Variable(torch.FloatTensor(batch_size).fill_(0))
-        noise = Variable(torch.FloatTensor(batch_size, cfg.GAN.Z_DIM))
+        label = Variable(torch.FloatTensor(batch_size).fill_(0)).to(device)
+        noise = Variable(torch.FloatTensor(batch_size, cfg.GAN.Z_DIM)).to(device)
 
         for iteration, (imgs, txts, locs, filename, caption) in enumerate(dataloader):
             imgs = Variable(imgs).to(device)

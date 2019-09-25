@@ -22,6 +22,6 @@ class Checkpointer():
         data["schedulerD"] = self.schedulerD
 
         save_path = os.path.join(self.save_dir, name)
-        self.logger.info("Saving checkpointer to {}".format(save_path))
+        self.logger.info("Saving checkpointer to {}.pth".format(save_path))
         torch.save(data, save_path)
 

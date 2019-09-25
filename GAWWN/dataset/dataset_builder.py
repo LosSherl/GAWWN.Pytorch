@@ -6,7 +6,6 @@ from sklearn.model_selection import train_test_split
 import torch
 import torch.utils.data as data
 import torchvision.transforms as transforms
-import torchfile
 
 from GAWWN.tools.config import cfg
 
@@ -99,6 +98,7 @@ class ImageTextLocDataset(data.Dataset):
         return txt
 
     def load_data(self, data_path):
+        all_data = torch.load(os.path.join(data_path, "data.pth"))
         filepath = os.path.join(data_path, "images.txt")
         idx2filename = dict()
         with open(filepath, "r") as f:
@@ -112,12 +112,11 @@ class ImageTextLocDataset(data.Dataset):
         txt_vecs = []
         for idx in idxs:
             filename = idx2filename[idx]
-            filepath = os.path.join(data_path, "data", filename.split('/')[1] + ".t7")
-            info = torchfile.load(filepath)
+            info = all_data[filename.split('/')[1]]
             img_path = os.path.join(data_path, "images", filename + ".jpg")
-            img, locs = get_img_locs(img_path, info[b"parts"], self.imsize, self.transfrom, self.norm)
-            txt_vec = torch.from_numpy(info[b'txt'])
-            cap = info[b'char'].T
+            img, locs = get_img_locs(img_path, info["parts"], self.imsize, self.transfrom, self.norm)
+            txt_vec = torch.from_numpy(info["txt"])
+            cap = info["char"].T
             part_locs.append(locs)
             txt_vecs.append(txt_vec)
             images.append(img)
