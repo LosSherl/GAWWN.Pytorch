@@ -20,7 +20,7 @@ def weight_init(m):
         m.bias.data.fill_(0)
 
 def showPic(imgs, win=0):
-    imgs = [x.detach().numpy().transpose(1, 2, 0) for x in imgs]
+    imgs = [x.detach().cpu().numpy().transpose(1, 2, 0) for x in imgs]
     half = len(imgs) / 2
     row1 = np.concatenate(imgs[:half], 1)
     row2 = np.concatenate(imgs[half:], 1)
