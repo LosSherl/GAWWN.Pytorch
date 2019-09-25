@@ -89,7 +89,7 @@ def train(netG, netD, dataloader, device, optimizerG, optimizerD, \
         time_spent = time.time() - start_training_time
         logger.info("Epoch:[{}/{}], Time spent {}, Time per epoch {:.4f} s".format(
             epoch + 1, nepochs, str(datetime.timedelta(seconds=time_spent)), time_spent / (epoch + 1)))
-        if (epoch + 1) % 100 == 0:
+        if (epoch + 1) % cfg.CHECKPOINT_PERIOD == 0:
             checkpointer.save("model_{:05d}".format(epoch + 1))
 
 
