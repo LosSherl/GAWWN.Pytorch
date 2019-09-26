@@ -69,7 +69,7 @@ class ImageTextLocDataset(data.Dataset):
 
         self.char2idx, self.idx2char = self.makeDict()
         
-        self.idxs, self.idx2filename, self.images, \
+        self.idxs, self.idx2filename, self.imgspath, \
             self.part_locs, self.captions, self.txt_vecs = self.load_data(data_path)
         self.train_idxs, self.test_idxs = train_test_split(self.idxs, test_size=0.1, random_state=5)
 
@@ -84,12 +84,13 @@ class ImageTextLocDataset(data.Dataset):
     def __getitem__(self, index):
         idx = self.idxs[index] - 1
         # filename = self.idx2filename[idx + 1]
-        img = self.images[idx]
+        img_path = self.imgspath[idx]
         part_locs = self.part_locs[idx]
+        img, locs = get_img_locs(img_path, part_locs, self.imsize, self.transfrom, self.norm)
         no = np.random.randint(0, cfg.TEXT.CAPTIONS_PER_IMAGE)
         txt_vec = self.txt_vecs[idx][no]
         # cap = self.get_captions(index, no)
-        return img, txt_vec, part_locs
+        return img, txt_vec, locs
 
     def get_captions(self, index, no):
         idx = self.idxs[index] - 1
@@ -113,20 +114,21 @@ class ImageTextLocDataset(data.Dataset):
         idxs = [i for i in range(1, len(idx2filename) + 1)]
         part_locs = []
         captions = []
-        images = []
+        imgs_path = []
         txt_vecs = []
         for idx in idxs:
             filename = idx2filename[idx]
             info = all_data[filename.split('/')[1]]
             img_path = os.path.join(data_path, "images", filename + ".jpg")
-            img, locs = get_img_locs(img_path, info["parts"], self.imsize, self.transfrom, self.norm)
+            parts = info["parts"]
+            # img, locs = get_img_locs(img_path, info["parts"], self.imsize, self.transfrom, self.norm)
             txt_vec = torch.from_numpy(info["txt"])
             cap = info["char"].T
-            part_locs.append(locs)
+            part_locs.append(parts)
             txt_vecs.append(txt_vec)
-            images.append(img)
+            imgs_path.append(img_path)
             captions.append(cap)
-        return idxs, idx2filename, images, part_locs, captions, txt_vecs
+        return idxs, idx2filename, imgs_path, part_locs, captions, txt_vecs
 
     def makeDict(self):
         alphabet = "abcdefghijklmnopqrstuvwxyz0123456789-,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{} "
