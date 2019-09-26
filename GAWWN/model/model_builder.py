@@ -6,9 +6,9 @@ from GAWWN.tools.config import cfg
 
 def build_models(device):
     netG = Gen()
-    netG.apply(weight_init)
+    netG.apply(weights_init)
     netD = Dis()
-    netD.apply(weight_init)
+    netD.apply(weights_init)
     netG.to(device)
     netD.to(device)
 
