@@ -72,13 +72,13 @@ def train(netG, netD, dataloader, device, optimizerG, optimizerD, \
                             "fake_score: {fake_score:.4f}",
                             "lr: {lr:.6f}",
                             "loss G: {loss_g:.4f}",
-                            "loss D: {loss_d:.4f}",
+                            "loss D: {l:.4f},{l1:.2f},{l2:.2f},{l3:.2f}",
                         ]
                     ).format(
                         epoch = epoch + 1, num_epochs = nepochs,
                         iter = iteration + 1, total_step = total_step,
                         fake_score = fake_score, lr = optimizerG.param_groups[0]["lr"],
-                        loss_g = errG, loss_d = errD
+                        loss_g = errG, l = errD, l1 = errD_real, l2 = errD_wrong, l3 = errD_fake
                     )
                 )
                 showPic(fake_imgs[:4], win=10, name=str(epoch))
