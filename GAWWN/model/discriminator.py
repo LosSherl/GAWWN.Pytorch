@@ -5,44 +5,40 @@ from GAWWN.tools.config import cfg
 from GAWWN.tools.tools import replicate
 
 class keyMulD(nn.Module):
-    def __init__(self, F_imgGlobal, F_prep_txtD):
+    def __init__(self):
         super(keyMulD, self).__init__()
         self.ndf = cfg.GAN.NDF
         self.nt_d = cfg.TEXT.TXT_FEATURE_DIM
-        self.F_imgGlobal = F_imgGlobal
         self.keypoint_dim = cfg.KEYPOINT.DIM
         
-        self.F_prep_txtD = F_prep_txtD
         self.conv = nn.Sequential(
             nn.Conv2d(self.nt_d + self.ndf * 2, self.ndf * 2, 3, 1, 1),
             nn.BatchNorm2d(self.ndf * 2),
             nn.LeakyReLU(0.2, True)
         )
 
-    def forward(self, img, loc, txt):
-        imgGlobal = self.F_imgGlobal(img)   # (bs, ndf * 2, 16, 16)
-        prep_txt_d = self.F_prep_txtD(txt)    # (bs, nt_d)
+    def forward(self, imgGlobal, prep_txt_d, locs):
         prep_txt_d = replicate(prep_txt_d, 2, self.keypoint_dim)    # (bs, nt_d, 16)
         prep_txt_d = replicate(prep_txt_d, 3, self.keypoint_dim)    # (bs, nt_d, 16, 16)
         imgTextGlobal = torch.cat((imgGlobal, prep_txt_d), 1)       # (bs, nt_d + ndf * 2, 16, 16)
         imgTextGlobal = self.conv(imgTextGlobal)    # (bs, ndf * 2, 16, 16)
         
         # loc (bs, num_elt, keypoint_dim, keypoint_dim)
-        loc = torch.sum(loc, 1)     # (bs, keypoint_dim, keypoint_dim)
-        loc = torch.clamp(loc, 0, 1) 
-        loc = replicate(loc, 1, self.ndf * 2)
+        locs = torch.sum(locs, 1)     # (bs, keypoint_dim, keypoint_dim)
+        locs = torch.clamp(locs, 0, 1) 
+        locs = replicate(locs, 1, self.ndf * 2)
 
-        x = imgTextGlobal * loc
+        x = imgTextGlobal * locs
         return x 
 
 
 class regionD(nn.Module):
-    def __init__(self, F_imgGlobal, F_prep_txtD):
+    def __init__(self):
         super(regionD, self).__init__()
         self.ndf = cfg.GAN.NDF
         self.num_elt = cfg.KEYPOINT.NUM_ELT
 
-        self.F_KeyMulD = keyMulD(F_imgGlobal, F_prep_txtD)
+        self.F_KeyMulD = keyMulD()
         self.conv = nn.Sequential(
             nn.Conv2d(self.ndf * 2 + self.num_elt, self.ndf * 2, 1),
             nn.BatchNorm2d(self.ndf * 2),
@@ -51,9 +47,9 @@ class regionD(nn.Module):
         )
         self.LReLU = nn.LeakyReLU(0.2, True)
 
-    def forward(self, img, loc, txt):
-        keyMul = self.F_KeyMulD(img, loc, txt)
-        x = torch.cat((keyMul, loc), 1)        # (bs, ngf * 2 + num_elt, 16, 16)
+    def forward(self, imgGlobal, prep_txt_d, locs):
+        keyMul = self.F_KeyMulD(imgGlobal, prep_txt_d, locs)
+        x = torch.cat((keyMul, locs), 1)        # (bs, ngf * 2 + num_elt, 16, 16)
         x = x.contiguous()
         x = self.conv(x)
         x = x.mean(3)
@@ -63,12 +59,10 @@ class regionD(nn.Module):
 
 
 class globalD(nn.Module):
-    def __init__(self, F_imgGlobal, F_prep_txtD):
+    def __init__(self):
         super(globalD, self).__init__()
         self.ndf = cfg.GAN.NDF
         self.nt_d = cfg.TEXT.TXT_FEATURE_DIM
-        self.F_imgGlobal = F_imgGlobal
-        self.F_prep_txtD = F_prep_txtD
 
         self.convGlobal = nn.Sequential(
             nn.Conv2d(self.ndf * 2, self.ndf * 4, 4, 2, 1),
@@ -88,12 +82,10 @@ class globalD(nn.Module):
             nn.LeakyReLU(0.2, True)
         )
 
-    def forward(self, img, txt):
-        img = self.F_imgGlobal(img)     # (bs, ndf * 2, 16, 16)
-        img = self.convGlobal(img)      # (bs, ndf * 8, 4, 4)
+    def forward(self, imgGlobal, prep_txt_d):
+        img = self.convGlobal(imgGlobal)      # (bs, ndf * 8, 4, 4)
 
-        txtGlobal = self.F_prep_txtD(txt)      # (bs, nt)
-        txtGlobal = replicate(txtGlobal, 2, 4)      # (bs, nt_d, 4)
+        txtGlobal = replicate(prep_txt_d, 2, 4)      # (bs, nt_d, 4)
         txtGlobal = replicate(txtGlobal, 3, 4)      # (bs, nt_d, 4, 4)
 
         imgTxtGlobal = torch.cat((img, txtGlobal), 1)     # (bs, nt_d + ndf * 8, 4 ,4)
@@ -127,8 +119,8 @@ class Dis(nn.Module):
             nn.LeakyReLU(0.2, True)
         )
 
-        self.F_regionD = regionD(self.imgGlobalD, self.prep_txtD) 
-        self.F_globalD = globalD(self.imgGlobalD, self.prep_txtD)
+        self.F_regionD = regionD() 
+        self.F_globalD = globalD()
         self.judge = nn.Sequential(
             nn.Linear(self.ndf * 2, self.ndf),
             nn.BatchNorm1d(self.ndf),
@@ -137,9 +129,11 @@ class Dis(nn.Module):
             nn.Sigmoid()
         )
 
-    def forward(self, img, txt, loc):
-        region_d = self.F_regionD(img, loc, txt)
-        global_d = self.F_globalD(img, txt)
+    def forward(self, img, txt, locs):
+        prep_txt_d = self.prep_txtD(txt)
+        image_Global = self.imgGlobalD(img)
+        region_d = self.F_regionD(image_Global, prep_txt_d, locs)
+        global_d = self.F_globalD(image_Global, prep_txt_d)
         x = torch.cat((region_d, global_d), 1)
         x = self.judge(x)
         return x
