@@ -19,7 +19,7 @@ def train(netG, netD, dataloader, device, optimizerG, optimizerD, \
     for epoch in range(nepochs):
         netG.train()
         netD.train()
-        for iteration, (imgs, txts, locs, filename, caption) in enumerate(dataloader):
+        for iteration, (imgs, txts, locs) in enumerate(dataloader):
             bs = imgs.shape[0]
             imgs = Variable(imgs).to(device)
             txts = Variable(txts).to(device)
@@ -57,8 +57,8 @@ def train(netG, netD, dataloader, device, optimizerG, optimizerD, \
 
             # update G network
             netG.zero_grad()
-            output = netD(fake_imgs, txts, locs).view(-1)
             fake_score = 0.99 * fake_score + 0.01 * output.mean()
+            output = netD(fake_imgs, txts, locs).view(-1)      
             errG = criterion(output, real_label)
             errG.backward()
             optimizerG.step()
@@ -81,7 +81,7 @@ def train(netG, netD, dataloader, device, optimizerG, optimizerD, \
                         loss_g = errG, loss_d = errD
                     )
                 )
-                showPic(fake_imgs[:4], win=10)
+                showPic(fake_imgs[:4], win=10, name=str(epoch))
                 showPic(imgs[:4], win=30)
         schedulerG.step()
         schedulerD.step()

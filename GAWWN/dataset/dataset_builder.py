@@ -83,13 +83,13 @@ class ImageTextLocDataset(data.Dataset):
 
     def __getitem__(self, index):
         idx = self.idxs[index] - 1
-        filename = self.idx2filename[idx + 1]
+        # filename = self.idx2filename[idx + 1]
         img = self.images[idx]
         part_locs = self.part_locs[idx]
         no = np.random.randint(0, cfg.TEXT.CAPTIONS_PER_IMAGE)
         txt_vec = self.txt_vecs[idx][no]
-        cap = self.get_captions(index, no)
-        return img, txt_vec, part_locs, filename, cap
+        # cap = self.get_captions(index, no)
+        return img, txt_vec, part_locs
 
     def get_captions(self, index, no):
         idx = self.idxs[index] - 1
