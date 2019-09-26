@@ -27,12 +27,11 @@ class Noise_txt(nn.Module):
         return noise_txt
 
 class Noise_txt_global(nn.Module):
-    def __init__(self, F_noise_txt):
+    def __init__(self):
         super(Noise_txt_global, self).__init__()
         self.ngf = cfg.GAN.NGF
         self.num_elt = cfg.KEYPOINT.NUM_ELT
 
-        self.F_noise_txt = F_noise_txt
         self.pre_loc = nn.Sequential(
             nn.Conv2d(self.num_elt, self.ngf, 4, 2, 1),
             nn.BatchNorm2d(self.ngf),
@@ -66,11 +65,10 @@ class Noise_txt_global(nn.Module):
             nn.ReLU(True)
         )
 
-    def forward(self, txt, loc, z):
+    def forward(self, noise_txt, loc):
         loc = self.pre_loc(loc)
         loc = loc.view(-1, self.ngf * 4)      # (bs, ngf * 4)
 
-        noise_txt = self.F_noise_txt(txt, z)    # (bs, ngf * 8)
         noise_txt = self.beforeCat(noise_txt)   # (bs, ngf * 4)
         noise_txt_loc = torch.cat((noise_txt, loc), 1)  # (bs, ngf * 8)
         noise_txt_loc = noise_txt_loc.view(-1, self.ngf * 8, 1, 1)
@@ -81,12 +79,11 @@ class Noise_txt_global(nn.Module):
         return noise_txt_loc
 
 class Noise_txt_region(nn.Module):
-    def __init__(self, F_noise_txt):
+    def __init__(self):
         super(Noise_txt_region, self).__init__()
         self.ngf = cfg.GAN.NGF
         self.keypoint_dim = cfg.KEYPOINT.DIM
 
-        self.F_noise_txt = F_noise_txt
         self.before_replicate = nn.Sequential(
             nn.Linear(self.ngf * 8, self.ngf * 4),
             nn.BatchNorm1d(self.ngf * 4),
@@ -98,8 +95,7 @@ class Noise_txt_region(nn.Module):
             nn.ReLU(True)
         )
  
-    def forward(self, txt, loc, z):
-        noise_txt = self.F_noise_txt(txt, z)        # (bs, ngf * 8)
+    def forward(self, noise_txt, loc):
         noise_txt = self.before_replicate(noise_txt)    # (bs, ngf * 4)
         noise_txt = replicate(noise_txt, 2, self.keypoint_dim)       # (bs, ngf * 4, keypoint_dim)
         noise_txt = replicate(noise_txt, 3, self.keypoint_dim)       # (bs, ngf * 4, keypoint_dim, keypoint_dim)
@@ -119,8 +115,8 @@ class Gen(nn.Module):
         self.ngf = cfg.GAN.NGF
         self.num_elt = cfg.KEYPOINT.NUM_ELT
         self.F_noise_txt = Noise_txt()
-        self.F_noise_txt_global = Noise_txt_global(self.F_noise_txt)
-        self.F_noise_txt_region = Noise_txt_region(self.F_noise_txt)
+        self.F_noise_txt_global = Noise_txt_global()
+        self.F_noise_txt_region = Noise_txt_region()
 
         self.upsampling_1 = nn.Sequential(
             nn.ConvTranspose2d(self.ngf * 5 + self.num_elt, self.ngf * 4, 3, 1, 1),
@@ -142,6 +138,7 @@ class Gen(nn.Module):
         )
 
         self.upsampling_2 = nn.Sequential(
+            nn.ReLU(True),
             nn.ConvTranspose2d(self.ngf * 4, self.ngf * 2, 4, 2, 1),
             nn.BatchNorm2d(self.ngf * 2),
             nn.ReLU(True),
@@ -153,8 +150,9 @@ class Gen(nn.Module):
         )
 
     def forward(self, txt, loc, z):
-        ntg = self.F_noise_txt_global(txt, loc, z)    # (bs, ngf, keypoint_dim, keypoint_dim)
-        ntr = self.F_noise_txt_region(txt, loc, z)    # (bs, ngf * 4, keypoint_dim, keypoint_dim)
+        noise_txt = self.F_noise_txt(txt, z)
+        ntg = self.F_noise_txt_global(noise_txt, loc)    # (bs, ngf, keypoint_dim, keypoint_dim)
+        ntr = self.F_noise_txt_region(noise_txt, loc)    # (bs, ngf * 4, keypoint_dim, keypoint_dim)
         x = torch.cat((ntg, ntr, loc), 1)           # (bs, ngf * 5 + num_elt, keypoint_dim, keypoint_dim)
         x = x.contiguous()  
         x = self.upsampling_1(x)      # (bs, ngf * 4, keypoint_dim, keypoint_dim)

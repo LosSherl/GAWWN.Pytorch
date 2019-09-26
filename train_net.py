@@ -60,7 +60,6 @@ def main():
 
     checkpointer = Checkpointer(netG, netD, optimizerG, optimizerD, schedulerG, schedulerD, logger, ouput_dir)
     
-
     logger.info("dataloader")
     trn_dataset = ImageTextLocDataset(cfg.ROOT_PATH, "all")
     trn_loader = DataLoader(trn_dataset, cfg.BATCH_SIZE, shuffle=True)
