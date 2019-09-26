@@ -25,7 +25,10 @@ def get_img_locs(img_path, parts, imsize, transform=None, normalize=None):
     h1 = math.ceil(np.random.uniform(1e-2, load_size - imsize))
     # crop to (imsize * imsize)
     img = t_img.crop((w1, h1, w1 + imsize, h1 + imsize))
-    
+
+    flip = np.random.uniform() > 0.5
+    if flip:
+        img = img.transpose(Image.FLIP_LEFT_RIGHT)
     num_elt = cfg.KEYPOINT.NUM_ELT
     keypoint_dim = cfg.KEYPOINT.DIM
     locs = torch.zeros((num_elt, keypoint_dim, keypoint_dim))
@@ -33,6 +36,8 @@ def get_img_locs(img_path, parts, imsize, transform=None, normalize=None):
     for i in range(len(parts)):
         parts[i][0] = max(1, parts[i][0] - w1)
         parts[i][1] = max(1, parts[i][1] - h1)
+        if flip:
+            parts[i][0] = max(1, imsize - parts[i][0] + 1)
         if parts[i][2] > 0.1:
             x = min(keypoint_dim - 1, round(parts[i][0] * keypoint_dim / imsize))
             y = min(keypoint_dim - 1, round(parts[i][1] * keypoint_dim / imsize))
