@@ -39,25 +39,25 @@ def train(netG, netD, dataloader, device, optimizerG, optimizerD, \
             # train with real
             netD.zero_grad()
 
-            output = netD(imgs, txts, locs)
+            output = netD(imgs, txts, locs).view(-1)
             errD_real = criterion(output, real_label)
             
             # train with wrong
-            output = netD(imgs, txts_shuf, locs)
+            output = netD(imgs, txts_shuf, locs).view(-1)
             errD_wrong = cls_weight * criterion(output, fake_label)
 
             # train with fake
-            output = netD(fake_imgs.detach(), txts, locs)
+            output = netD(fake_imgs.detach(), txts, locs).view(-1)
             fake_score = 0.99 * fake_score + 0.01 * output.mean()
             errD_fake = (1 - cls_weight) * criterion(output, fake_label)
             
             errD = errD_real + errD_fake + errD_wrong
-            errD.backward(retain_graph=True)
+            errD.backward()
             optimizerD.step()
 
             # update G network
             netG.zero_grad()
-            # output = netD(fake_imgs, txts, locs)
+            output = netD(fake_imgs, txts, locs).view(-1)
             fake_score = 0.99 * fake_score + 0.01 * output.mean()
             errG = criterion(output, real_label)
             errG.backward()
