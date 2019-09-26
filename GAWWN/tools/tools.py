@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 import numpy as np
 import display
 import cv2
@@ -11,14 +12,14 @@ def replicate(x, dim, times):
     x = x.repeat(dims)
     return x
 
-def weight_init(m):
-    class_name = m.__class__.__name__
-    if class_name.find("Conv") != -1:
-        m.weight.data.normal_(0.0, 0.02)
-        m.bias.data.fill_(0)
-    elif class_name.find("BatchNorm") != -1:
-        m.weight.data.normal_(1.0, 0.02)
-        m.bias.data.fill_(0)
+def weights_init(m):
+    classname = m.__class__.__name__
+    if classname.find('Conv') != -1:
+        nn.init.normal_(m.weight.data, 0.0, 0.02)
+    elif classname.find('BatchNorm') != -1:
+        nn.init.normal_(m.weight.data, 1.0, 0.02)
+        nn.init.constant_(m.bias.data, 0)
+
 
 def showPic(imgs, win=0, name="Real"):
     imgs = [cv2.flip(x.detach().cpu().numpy().transpose(1, 2, 0), 0) for x in imgs]
