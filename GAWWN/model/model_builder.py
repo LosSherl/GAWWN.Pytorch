@@ -1,7 +1,7 @@
 import torch
 from GAWWN.model.generator import Gen
 from GAWWN.model.discriminator import Dis
-from GAWWN.tools.tools import weight_init
+from GAWWN.tools.tools import weights_init
 from GAWWN.tools.config import cfg
 
 def build_models(device):
