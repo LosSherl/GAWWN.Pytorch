@@ -47,7 +47,7 @@ def get_img_locs(img_path, parts, imsize, transform=None, normalize=None):
 
 
 class ImageTextLocDataset(data.Dataset):
-    def __init__(self, data_path, split = "train",
+    def __init__(self, data_path, split = "all",
                     transfrom = None, target_transform = None):
         self.transfrom = transfrom
         self.target_transform = target_transform
@@ -70,7 +70,7 @@ class ImageTextLocDataset(data.Dataset):
 
         if split == "train":
             self.idxs = self.train_idxs
-        else:
+        elif split == "test":
             self.idxs = self.test_idxs
 
     def __len__(self):

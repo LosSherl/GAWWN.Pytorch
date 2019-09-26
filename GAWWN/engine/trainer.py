@@ -47,18 +47,17 @@ def train(netG, netD, dataloader, device, optimizerG, optimizerD, \
             errD_wrong = cls_weight * criterion(output, fake_label)
 
             # train with fake
-            # label.data.fill_(0)
             output = netD(fake_imgs.detach(), txts, locs)
             fake_score = 0.99 * fake_score + 0.01 * output.mean()
             errD_fake = (1 - cls_weight) * criterion(output, fake_label)
             
             errD = errD_real + errD_fake + errD_wrong
-            errD.backward()
+            errD.backward(retain_graph=True)
             optimizerD.step()
 
             # update G network
             netG.zero_grad()
-            output = netD(fake_imgs, txts, locs)
+            # output = netD(fake_imgs, txts, locs)
             fake_score = 0.99 * fake_score + 0.01 * output.mean()
             errG = criterion(output, real_label)
             errG.backward()
@@ -69,8 +68,8 @@ def train(netG, netD, dataloader, device, optimizerG, optimizerD, \
                     ", ".join(
                         [
                             "Epoch: [{epoch}/{num_epochs}]",
-                            "Step: [{iter}/{total_step}",
-                            "Fake_score: {fake_score:.4f}",
+                            "step: [{iter}/{total_step}",
+                            "fake_score: {fake_score:.4f}",
                             "lr: {lr:.6f}",
                             "loss G: {loss_g:.4f}",
                             "loss D: {loss_d:.4f}",
