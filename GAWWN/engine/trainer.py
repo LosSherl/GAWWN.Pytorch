@@ -9,7 +9,6 @@ from GAWWN.tools.tools import showPic
 def train(netG, netD, dataloader, device, optimizerG, optimizerD, \
         criterion, schedulerG, schedulerD, logger, checkpointer):
     logger.info("Start trainning")
-
     total_step = len(dataloader)
     start_training_time = time.time()
     nepochs = cfg.NEPOCHS

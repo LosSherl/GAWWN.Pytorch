@@ -48,7 +48,7 @@ def get_img_locs(img_path, parts, imsize, transform=None, normalize=None):
     if normalize is not None:
         img = normalize(img)
 
-    return img * 2 - 1, locs
+    return img, locs
 
 
 class ImageTextLocDataset(data.Dataset):
