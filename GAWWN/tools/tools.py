@@ -24,7 +24,7 @@ def weights_init(m):
 
 def showPic(imgs, locs, win=0, name="Real"):
     ToPIL = T.ToPILImage()
-    imgs = [ToPIL((x + 0.5) * 2) for x in imgs]
+    imgs = [np.array(ToPIL((x + 0.5) * 2)) for x in imgs]
     for i in range(4):
         for y in range(16):
             for x in range(16):
