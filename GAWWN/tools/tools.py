@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import numpy as np
+import torchvision.transforms as T
 import display
 import cv2
 
@@ -22,12 +23,13 @@ def weights_init(m):
 
 
 def showPic(imgs, locs, win=0, name="Real"):
-    imgs = [cv2.flip(x.transpose(1, 2, 0), 0) for x in imgs]
-    # for i in range(4):
-    #     for y in range(16):
-    #         for x in range(16):
-    #             if locs[i][y][x] > 0:
-    #                 cv2.rectangle(imgs[i], (x * 8, y * 8), (x * 8 + 8, y * 8 + 8), (0, 0, 255), 1)
+    ToPIL = T.ToPILImage()
+    imgs = [ToPIL((x + 0.5) * 2) for x in imgs]
+    for i in range(4):
+        for y in range(16):
+            for x in range(16):
+                if locs[i][y][x] > 0:
+                    cv2.rectangle(imgs[i], (x * 8, y * 8), (x * 8 + 8, y * 8 + 8), (0, 0, 255), 1)
     half = len(imgs) // 2
     row1 = np.concatenate(imgs[:half], 1)
     row2 = np.concatenate(imgs[half:], 1)
