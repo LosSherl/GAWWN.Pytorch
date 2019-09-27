@@ -22,13 +22,15 @@ def weights_init(m):
 
 
 def showPic(imgs, locs, win=0, name="Real"):
+    imgs = [(x + 0.5) / 2 * 255 for x in imgs]
     imgs = [cv2.flip(x.transpose(1, 2, 0), 0) for x in imgs]
-    imgs = [(x + 0.5) / 2 for x in imgs]
+    # imgs = [x.transpose(1, 2, 0) for x in imgs]
     for i in range(4):
         for y in range(16):
             for x in range(16):
-                if locs[i][y][x] > 0:
-                    cv2.rectangle(imgs[i], (x * 8, y * 8), (x * 8 + 8, y * 8 + 8), (0, 0, 255), 1)
+                if locs[i][y][x] > 0.3:
+                    cv2.rectangle(imgs[i], (x * 8, 127 - y * 8), (x * 8 + 8, 119 - y * 8), (0, 0, 255), 1)
+                    # cv2.rectangle(imgs[i], (x * 8,  y * 8), (x * 8 + 8, y * 8 + 8), (0, 0, 255), 1)
     half = len(imgs) // 2
     row1 = np.concatenate(imgs[:half], 1)
     row2 = np.concatenate(imgs[half:], 1)

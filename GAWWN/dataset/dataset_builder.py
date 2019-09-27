@@ -42,7 +42,7 @@ def get_img_locs(img_path, parts, imsize, transform=None, normalize=None):
             x = min(keypoint_dim - 1, round(parts[i][0] * keypoint_dim / imsize))
             y = min(keypoint_dim - 1, round(parts[i][1] * keypoint_dim / imsize))
             locs[i][int(y)][int(x)] = 1
-    
+
     if transform is not None:
         img = transform(img)
     if normalize is not None:
