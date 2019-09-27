@@ -23,7 +23,7 @@ def weights_init(m):
 
 def showPic(imgs, locs, win=0, name="Real"):
     imgs = [cv2.flip(x.transpose(1, 2, 0), 0) for x in imgs]
-    for i in range(4)):
+    for i in range(4):
         for j in range(15):
             locs[i] = torch.sum(locs[i], 1)
         for y in range(16):
