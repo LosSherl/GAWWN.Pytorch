@@ -14,8 +14,8 @@ class Checkpointer():
     
     def save(self, name):
         data = dict()
-        data["netG"] = self.netG
-        data["netD"] = self.netD
+        data["netG"] = self.netG.state_dict()
+        data["netD"] = self.netD.state_dict()
         data["optimizerG"] = self.optimizerG
         data["optimizerD"] = self.optimizerD
         data["schedulerG"] = self.schedulerG
