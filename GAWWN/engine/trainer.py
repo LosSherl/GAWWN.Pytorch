@@ -81,8 +81,8 @@ def train(netG, netD, dataloader, device, optimizerG, optimizerD, \
                         loss_g = errG, l = errD, l1 = errD_real, l2 = errD_wrong, l3 = errD_fake
                     )
                 )
-                showPic(fake_imgs[:4].detach().cpu().numpy(), locs[:4].cpu().numpy(), win=10, name=str(epoch))
-                showPic(imgs[:4].cpu().numpy(), locs[:4].cpu().numpy(), win=30)
+                showPic(fake_imgs[:4].detach().cpu().numpy(), locs[:4].cpu().numpy().sum(1), win=10, name=str(epoch))
+                showPic(imgs[:4].cpu().numpy(), locs[:4].cpu().numpy().sum(1), win=30)
         schedulerG.step()
         schedulerD.step()
         time_spent = time.time() - start_training_time
