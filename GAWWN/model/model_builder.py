@@ -11,7 +11,6 @@ def build_models(device):
     netD.apply(weights_init)
     netG.to(device)
     netD.to(device)
-
     criterion = torch.nn.BCELoss().to(device)
     optimizerG = torch.optim.Adam(netG.parameters(), lr=cfg.LR, betas=cfg.BETAS)
     optimizerD = torch.optim.Adam(netD.parameters(), lr=cfg.LR, betas=cfg.BETAS)
