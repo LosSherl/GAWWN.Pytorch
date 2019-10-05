@@ -35,4 +35,8 @@ def showPic(imgs, locs, win=0, name="Real"):
     row1 = np.concatenate(imgs[:half], 1)
     row2 = np.concatenate(imgs[half:], 1)
     content = np.concatenate((row1, row2), 0)
-    display.image(content, win=win, title=name)
+    try:
+        display.image(content, win=win, title=name)
+    except Exception as e:
+        print(e)
+    

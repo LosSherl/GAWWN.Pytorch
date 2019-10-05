@@ -16,13 +16,13 @@ class Checkpointer():
         data = dict()
         data["netG"] = self.netG.state_dict()
         data["netD"] = self.netD.state_dict()
-        if optimizerG is not None:
+        if self.optimizerG is not None:
             data["optimizerG"] = self.optimizerG.state_dict()
-        if optimizerD is not None:
+        if self.optimizerD is not None:
             data["optimizerD"] = self.optimizerD.state_dict()
-        if schedulerG is not None: 
+        if self.schedulerG is not None: 
             data["schedulerG"] = self.schedulerG.state_dict()
-        if schedulerD is not None:
+        if self.schedulerD is not None:
             data["schedulerD"] = self.schedulerD.state_dict()
 
         save_path = os.path.join(self.save_dir, name)
