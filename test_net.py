@@ -1,4 +1,5 @@
-import argsparse
+import os
+import argparse
 import torch
 from torch.utils.data import DataLoader
 
@@ -10,19 +11,20 @@ from GAWWN.tools.logger import setupLogger
 from GAWWN.tools.checkpointer import Checkpointer
 from GAWWN.engine.tester import test
 
-def main:
+def main():
     parser = argparse.ArgumentParser(description="GAWWN")
-    parser.add_augment(
+    parser.add_argument(
         "-m",
-        dest=model_path
+        dest="model_path"
     )
-    parser.add_augment(
+    parser.add_argument(
         "-p",
-        dest=root_path
+        dest="root_path"
     )
     parser.add_argument(
         "-bs",
         dest = "batch_size",
+        default = 4,
         type = int
     )
 
@@ -50,5 +52,5 @@ def main:
     test(netG, dataLoader, device, logger)
     
 
-if __name__ = "__main__":
+if __name__ == "__main__":
     main()
