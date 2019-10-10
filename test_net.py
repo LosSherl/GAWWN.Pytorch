@@ -15,7 +15,8 @@ def main():
     parser = argparse.ArgumentParser(description="GAWWN")
     parser.add_argument(
         "-m",
-        dest="model_path"
+        dest="model_path",
+        default="output/GAWWN/model_01000.pth"
     )
     parser.add_argument(
         "-p",

@@ -1,13 +1,18 @@
 import torch
 from GAWWN.model.generator import Gen
 from GAWWN.model.discriminator import Dis
+from GAWWN.model.keypoints_gen import keyGen, keyDis
 from GAWWN.tools.tools import weights_init
 from GAWWN.tools.config import cfg
 
 def build_models(device):
-    netG = Gen()
+    if cfg.MODE == "img":
+        netG = Gen()
+        netD = Dis()
+    else:
+        netG = keyGen()
+        netD = keyDis()
     netG.apply(weights_init)
-    netD = Dis()
     netD.apply(weights_init)
     netG.to(device)
     netD.to(device)

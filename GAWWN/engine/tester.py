@@ -13,6 +13,10 @@ def test(netG, dataLoader, device, logger):
             imgs = Variable(imgs).to(device)
             txts = Variable(txts).to(device)
             locs = Variable(locs).to(device)
+            # locs[0][1].fill_(0.0)
+            # locs[0][13].fill_(0.0)
+            # locs[0][13][13][13] = 1
+            # locs[0][1][3][3] = 1
             noise = Variable(torch.FloatTensor(bs, cfg.GAN.Z_DIM)).to(device)
             noise.data.normal_(0,1)
             fake_imgs = netG(txts, locs, noise)

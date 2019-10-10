@@ -42,6 +42,11 @@ def main():
         dest = "lr",
         type = float
     )
+    parser.add_argument(
+        "-m",
+        dest = "mode",
+        default = "img" 
+    )
 
     args = parser.parse_args()
     args = vars(args)
@@ -64,9 +69,10 @@ def main():
     trn_dataset = ImageTextLocDataset(cfg.ROOT_PATH, "all")
     trn_loader = DataLoader(trn_dataset, cfg.BATCH_SIZE, shuffle=True, num_workers=4)
     logger.info("data loaded")
-
-    train(netG, netD, trn_loader, device, optimizerG, optimizerD, criterion, schedulerG, schedulerD, logger, checkpointer)
-
+    if cfg.MODE == "img":
+        train(netG, netD, trn_loader, device, optimizerG, optimizerD, criterion, schedulerG, schedulerD, logger, checkpointer)
+    else:
+        key_train(netG, netD, trn_loader, device, optimizerG, optimizerD, criterion, schedulerG, schedulerD, logger, checkpointer)
 
 if __name__ == "__main__":
     main()

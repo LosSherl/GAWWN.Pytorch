@@ -86,11 +86,18 @@ class ImageTextLocDataset(data.Dataset):
         filename = self.idx2filename[idx + 1]
         img_path = self.imgspath[idx]
         part_locs = self.part_locs[idx]
+        g_locs = part_locs.copy()
+        drop = np.random.random(cfg.KEYPOINT.NUM_ELT)
+        for i in range(cfg.KEYPOINT.NUM_ELT):
+            if part_locs[i][2] < 0.01:
+                part_locs[i].fill(0)
+            if drop[i] < 0.9:
+                g_locs[i].fill(0)
         img, locs = get_img_locs(img_path, part_locs, self.imsize, self.transfrom, self.norm)
         no = np.random.randint(0, cfg.TEXT.CAPTIONS_PER_IMAGE)
         txt_vec = self.txt_vecs[idx][no]
         cap = self.get_captions(index, no)
-        return img, txt_vec, locs, (filename, cap)
+        return img, txt_vec, locs, (filename, cap), part_locs, g_locs
 
     def get_captions(self, index, no):
         idx = self.idxs[index] - 1

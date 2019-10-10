@@ -15,6 +15,7 @@ __C.BETAS = (0.5, 0.999)
 __C.LR_DECAY = 0.5
 __C.DECAY_PERIOD = 100
 __C.OUTPUT_DIR = "output"
+__C.DROP_RATE = 0.9
 
 # Tree Options
 __C.TREE = edict()

@@ -18,7 +18,7 @@ def train(netG, netD, dataloader, device, optimizerG, optimizerD, \
     for epoch in range(nepochs):
         netG.train()
         netD.train()
-        for iteration, (imgs, txts, locs, file_caps) in enumerate(dataloader):
+        for iteration, (imgs, txts, locs, file_caps, _, _) in enumerate(dataloader):
             bs = imgs.shape[0]
             imgs = Variable(imgs).to(device)
             txts = Variable(txts).to(device)
@@ -90,8 +90,30 @@ def train(netG, netD, dataloader, device, optimizerG, optimizerD, \
         if (epoch + 1) % cfg.CHECKPOINT_PERIOD == 0:
             checkpointer.save("model_{:05d}.pth".format(epoch + 1))
 
+def key_train(netG, netD, dataloader, device, optimizerG, optimizerD, \
+        criterion, schedulerG, schedulerD, logger, checkpointer):
+    logger.info("Start trainning")
+    total_step = len(dataloader)
+    start_training_time = time.time()
+    nepochs = cfg.NEPOCHS
+    fake_score = cfg.GAN.FAKE_SCORE
 
+    for epoch in nepochs:
+        netG.train()
+        netD.train()
+        for i, (_, txts, _, file_caps, parts_locs, g_locs) in enumerate(dataloader):
+            bs = txts.shape[0]
+            noise = torch.FloatTensor(bs, cfg.GAN.Z_DIM).to(device)
+            parts_locs = Variable(parts_locs).to(device)
+            txts = Variable(txts).to(device)
+            real_label = Variable(torch.FloatTensor(bs).fill_(1)).to(device)
+            fake_label = Variable(torch.FloatTensor(bs).fill_(0)).to(device)
+            
+            # train with real
+            output = netD(parts_locs, txts).view(-1)
+            errD_real = criterion(output, real_label)
 
+            # loc_g = 
 
 
 
