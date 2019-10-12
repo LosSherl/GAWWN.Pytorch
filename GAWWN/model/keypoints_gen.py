@@ -1,6 +1,7 @@
 
 import torch
 import torch.nn as nn
+import numpy as np
 
 from GAWWN.tools.tools import replicate
 from GAWWN.tools.config import cfg
@@ -47,17 +48,19 @@ class keyGen(nn.Module):
     def forward(self, noise, txts, locs):
         maskOn = replicate(locs[:,:,-1], 2, 3)
         maskOff = -maskOn + 1
-        locs = locs.view(-1, self.num_elt * 3)
+        f_locs = locs.view(-1, self.num_elt * 3)
         z = self.z_enc(noise)
         t = self.t_enc(txts)
-        l = self.loc_enc(locs)
+        l = self.loc_enc(f_locs)
         x = torch.cat((z, t, l), 1)
         x = self.convG(x)
         x = x.view(-1, self.num_elt, 3)
         x = torch.sigmoid(x)
+        
         kg = x * maskOff
-        kc = maskOn * locs
-        return kg + kc
+        kc = locs * maskOn
+        x = kg + kc
+        return x
 
 class keyDis(nn.Module):
     def __init__(self):
@@ -92,7 +95,7 @@ class keyDis(nn.Module):
     def forward(self, locs, txts):
         locs = locs.view(-1, self.num_elt * 3)
         locs = self.loc_enc(locs)
-        locs = loc_enc(locs)
-        txts = t_enc(txts)
+        txts = self.t_enc(txts)
         x = torch.cat((locs, txts), 1)
-        return judge(x)
+        x = self.judge(x)
+        return x

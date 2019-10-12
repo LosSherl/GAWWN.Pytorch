@@ -13,7 +13,7 @@ def get_img_locs(img_path, parts, imsize, transform=None, normalize=None):
     img = Image.open(img_path).convert('RGB')
     load_size = cfg.IMAGE.LOADSIZE
     width, height = img.size
-    
+    parts = parts.astype("float32")
     # scale to (load_size * load_size) 
     t_img = img.resize((load_size, load_size))
     factor_x = load_size / width
@@ -34,13 +34,15 @@ def get_img_locs(img_path, parts, imsize, transform=None, normalize=None):
     locs = torch.zeros((num_elt, keypoint_dim, keypoint_dim))
    
     for i in range(len(parts)):
-        parts[i][0] = max(1, parts[i][0] - w1)
+        parts[i][0] = max(1, parts[i][0] - w1) 
         parts[i][1] = max(1, parts[i][1] - h1)
         if flip:
             parts[i][0] = max(1, imsize - parts[i][0] + 1)
+        parts[i][0] = parts[i][0] / imsize
+        parts[i][1] = parts[i][1] / imsize
         if parts[i][2] > 0.1:
-            x = min(keypoint_dim - 1, round(parts[i][0] * keypoint_dim / imsize))
-            y = min(keypoint_dim - 1, round(parts[i][1] * keypoint_dim / imsize))
+            x = min(keypoint_dim - 1, round(parts[i][0] * keypoint_dim))
+            y = min(keypoint_dim - 1, round(parts[i][1] * keypoint_dim))
             locs[i][int(y)][int(x)] = 1
 
     if transform is not None:
@@ -48,7 +50,7 @@ def get_img_locs(img_path, parts, imsize, transform=None, normalize=None):
     if normalize is not None:
         img = normalize(img)
 
-    return img, locs
+    return parts, img, locs
 
 
 class ImageTextLocDataset(data.Dataset):
@@ -86,6 +88,7 @@ class ImageTextLocDataset(data.Dataset):
         filename = self.idx2filename[idx + 1]
         img_path = self.imgspath[idx]
         part_locs = self.part_locs[idx]
+        part_locs, img, locs = get_img_locs(img_path, part_locs, self.imsize, self.transfrom, self.norm)
         g_locs = part_locs.copy()
         drop = np.random.random(cfg.KEYPOINT.NUM_ELT)
         for i in range(cfg.KEYPOINT.NUM_ELT):
@@ -93,7 +96,6 @@ class ImageTextLocDataset(data.Dataset):
                 part_locs[i].fill(0)
             if drop[i] < 0.9:
                 g_locs[i].fill(0)
-        img, locs = get_img_locs(img_path, part_locs, self.imsize, self.transfrom, self.norm)
         no = np.random.randint(0, cfg.TEXT.CAPTIONS_PER_IMAGE)
         txt_vec = self.txt_vecs[idx][no]
         cap = self.get_captions(index, no)

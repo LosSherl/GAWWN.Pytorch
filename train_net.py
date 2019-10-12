@@ -8,7 +8,7 @@ from GAWWN.tools.logger import setupLogger
 from GAWWN.tools.config import cfg
 from GAWWN.model.model_builder import build_models
 from GAWWN.dataset.dataset_builder import ImageTextLocDataset
-from GAWWN.engine.trainer import train
+from GAWWN.engine.trainer import train, key_train
 from GAWWN.tools.checkpointer import Checkpointer
 
 
