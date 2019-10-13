@@ -156,8 +156,8 @@ def key_train(netG, netD, dataloader, device, optimizerG, optimizerD, \
                     )
                 )
             if iteration % 5 == 0:
-                showPic(imgs[:4].numpy(), to_locs(parts_locs[:4].cpu().numpy()), win=30)
-                showPic(imgs[:4].numpy(), to_locs(locs_g[:4].detach().cpu().numpy()), win=10, name=str(epoch))
+                showPic(imgs[:4].numpy(), to_locs(parts_locs[:4].cpu().numpy()).sum(1), win=30)
+                showPic(imgs[:4].numpy(), to_locs(locs_g[:4].detach().cpu().numpy()).sum(1), win=10, name=str(epoch))
         schedulerG.step()
         schedulerD.step()
         time_spent = time.time() - start_training_time

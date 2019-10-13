@@ -24,14 +24,14 @@ def weights_init(m):
 def to_locs(parts):
     imsize = cfg.IMAGE.FINESIZE
     keypoint_dim =  cfg.KEYPOINT.DIM
-    locs = np.zeros((parts.shape[0], cfg.KEYPOINT.NUM_ELT, keypoint_dim, keypoint_dim))
+    locs = np.zeros((parts.shape[0], cfg.KEYPOINT.NUM_ELT, keypoint_dim, keypoint_dim), dtype="float32")
     for i in range(parts.shape[0]):
         for j in range(cfg.KEYPOINT.NUM_ELT):
             if parts[i][j][2] > 0.5:
                 x = min(keypoint_dim - 1, round(parts[i][j][0] * keypoint_dim))
                 y = min(keypoint_dim - 1, round(parts[i][j][1] * keypoint_dim))
                 locs[i][j][int(y)][int(x)] = 1
-    return locs.sum(1)
+    return locs
 
 def showPic(imgs, locs, win=0, name="Real"):
     imgs = [(x + 0.5) / 2 * 255 for x in imgs]
